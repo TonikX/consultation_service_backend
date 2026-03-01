@@ -37,7 +37,7 @@ class Group(models.Model):
     end_date = models.DateField()
 
     def __str__(self):
-        return self.name_group
+        return f'{self.name_group} ({self.start_date} - {self.end_date})'
 
 
 class Subject(models.Model):
@@ -91,16 +91,17 @@ class StudentFlow(models.Model):
 class Event(models.Model):
     id_event = models.AutoField(primary_key=True)
     id_flow = models.ForeignKey(GroupFlow, on_delete=models.CASCADE)
+    event_name = models.CharField(max_length=100)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
-    recomended_number_students = models.IntegerField()
+    recomended_number_students = models.IntegerField(null=True, blank=True)
     note = models.CharField(max_length=512, blank=True)
     is_scheduled = models.BooleanField(default=False)
-    time_on_one_student = models.IntegerField()
-    event_location = models.CharField(max_length=300)
+    time_on_one_student = models.IntegerField(null=True, blank=True)
+    event_location = models.CharField(max_length=300, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.id_event}"
+        return f"{self.event_name}"
 
 
 class WroteTime(models.Model):
@@ -108,16 +109,22 @@ class WroteTime(models.Model):
     time = models.CharField(max_length=25)
     id_event = models.ForeignKey(Event, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f"{self.id_event} - {self.time}"
+
 
 class StudentEvent(models.Model):
     id_wrote = models.AutoField(primary_key=True)
-    id_event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    id_event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True, blank=True)
     id_time = models.ForeignKey(WroteTime, on_delete=models.CASCADE)
     note_student = models.CharField(max_length=255, blank=True)
     note_teacher = models.CharField(max_length=255, blank=True)
     is_visit = models.BooleanField(default=False)
     id_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     register_time = models.DateTimeField()
+
+    def __str__(self):
+        return f"{self.id_event} - {self.id_user}"
 
 
 class UserGroup(models.Model):
@@ -127,10 +134,16 @@ class UserGroup(models.Model):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
 
+    def __str__(self):
+        return f'{self.id_user.employee_number} - {self.id_group.name_group}'
+
 
 class ProgramSubjects(models.Model):
     id_program = models.ForeignKey(Program, on_delete=models.CASCADE)
     id_subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.id_program.program_name} - {self.id_subject.subject_name}'
 
 
 class EventGroup(models.Model):
@@ -138,10 +151,16 @@ class EventGroup(models.Model):
     id_event = models.ForeignKey(Event, on_delete=models.CASCADE)
     id_group = models.ForeignKey(Group, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f'{self.id_event} - {self.id_group.name_group}'
+
 
 class EventFlow(models.Model):
     id_event_flow = models.AutoField(primary_key=True)
     id_event = models.ForeignKey(Event, on_delete=models.CASCADE)
     id_flow = models.ForeignKey(GroupFlow, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.id_event} - {self.id_flow.flow_name}'
 
     
