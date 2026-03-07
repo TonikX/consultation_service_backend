@@ -208,7 +208,7 @@ class EventGroup(models.Model):
 
 class EventFlow(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="event_flows")
-    flow = models.ForeignKey(Flow, on_delete=models.CASCADE, related_name="events")
+    flow = models.ForeignKey(Flow, on_delete=models.CASCADE, related_name="event_flows")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
