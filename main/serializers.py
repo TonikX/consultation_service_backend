@@ -3,7 +3,7 @@ from django.contrib.auth.hashers import make_password
 from .models import *
 
 class CustomUserSerializer(serializers.ModelSerializer):
-    """Сериализатор для чтения/обновления пользователя"""
+    """Чтение/обновление юзера"""
     full_name = serializers.SerializerMethodField()
     
     class Meta:
@@ -20,7 +20,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 
 class CustomUserCreateSerializer(serializers.ModelSerializer):
-    """Сериализатор для создания пользователя"""
+    """Создание юзера"""
     password = serializers.CharField(write_only=True, style={'input_type': 'password'})
     re_password = serializers.CharField(write_only=True, style={'input_type': 'password'}, label='Подтверждение пароля')
 
@@ -45,7 +45,7 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
 
 
 class CustomUserListSerializer(serializers.ModelSerializer):
-    """Упрощенный сериализатор для списка пользователей"""
+    """Сокращенный для списка юзеров"""
     full_name = serializers.SerializerMethodField()
     
     class Meta:
@@ -55,6 +55,76 @@ class CustomUserListSerializer(serializers.ModelSerializer):
     def get_full_name(self, obj):
         parts = [obj.last_name, obj.first_name, obj.middle_name]
         return ' '.join(filter(None, parts))
+
+class EventCreateSerializer(serializers.ModelSerializer):
+    """Создание мероприятия"""
+    group_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        write_only=True,
+        required=False,  
+        allow_empty=True, 
+        help_text="Список ID групп для проверки пересечений (опционально)"
+    )
+    
+    class Meta:
+        model = Event
+        fields = [
+            'flow', 'event_name', 'start_time', 'end_time',
+            'recomended_number_students', 'note', 'event_location',
+            'time_on_one_student', 'group_ids'
+        ]
+    
+    def validate(self, data):
+        if data['start_time'] >= data['end_time']:
+            raise serializers.ValidationError(
+                "Время окончания должно быть позже времени начала"
+            )
+        
+        group_ids = data.get('group_ids')
+        if group_ids is not None: 
+            existing_groups = Group.objects.filter(id__in=group_ids)
+            if len(existing_groups) != len(group_ids):
+                raise serializers.ValidationError(
+                    "Некоторые группы не найдены"
+                )
+        
+        return data
+
+
+class EventListSerializer(serializers.ModelSerializer):
+    """Список мероприятий со статистикой"""
+    flow_name = serializers.CharField(source='flow.flow_name', read_only=True)
+    subject_name = serializers.CharField(source='flow.subject.subject_name', read_only=True)
+    teachers = serializers.SerializerMethodField()
+    registered_count = serializers.SerializerMethodField()
+    is_registered = serializers.SerializerMethodField()
+    groups = serializers.StringRelatedField(many=True, source='groups.group', read_only=True)
+    
+    class Meta:
+        model = Event
+        fields = [
+            'id', 'event_name', 'flow_name', 'subject_name',
+            'start_time', 'end_time', 'event_location',
+            'teachers', 'registered_count', 'is_registered',
+            'recomended_number_students', 'groups', 'note'
+        ]
+    
+    def get_teachers(self, obj):
+        teachers = CustomUser.objects.filter(
+            teacher_subjects__events__event=obj
+        ).distinct()
+        return [f"{t.last_name} {t.first_name}" for t in teachers]
+    
+    def get_registered_count(self, obj):
+        return StudentEvent.objects.filter(event=obj).count()
+    
+    def get_is_registered(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return StudentEvent.objects.filter(
+                event=obj, user=request.user
+            ).exists()
+        return False
 
 
 class ProgramSerializer(serializers.ModelSerializer):

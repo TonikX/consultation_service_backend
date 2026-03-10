@@ -1,5 +1,11 @@
-from django.shortcuts import render
+from django.forms import ValidationError
 from rest_framework import filters
+
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import status
+from django.utils import timezone
+from .services import EventService
 
 # Create your views here.
 
@@ -7,7 +13,6 @@ from rest_framework import viewsets, permissions
 from .serializers import *
 
 class CustomUserViewSet(viewsets.ModelViewSet):
-    """ViewSet для управления пользователями"""
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -26,7 +31,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
     def get_serializer_class(self):
         if self.action == 'list':
-            return CustomUserListSerializer  # упрощенный для списка
+            return CustomUserListSerializer  
         return CustomUserSerializer
     
 
@@ -57,7 +62,46 @@ class WroteTimeViewSet(viewsets.ModelViewSet):
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-
+    
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return EventCreateSerializer
+        elif self.action == 'list':
+            return EventListSerializer
+        return EventSerializer
+    
+    def perform_create(self, serializer):
+        """Создание мероприятия с проверками"""
+        group_ids = serializer.validated_data.pop('group_ids')
+        groups = Group.objects.filter(id__in=group_ids)
+        
+        event, warnings = EventService.create_event(
+            serializer.validated_data,
+            self.request.user,
+            groups
+        )
+        serializer.instance = event
+        
+        if warnings:
+            self.warnings = warnings
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        
+        headers = self.get_success_headers(serializer.data)
+        response_data = serializer.data
+        
+        if hasattr(self, 'warnings') and self.warnings:
+            response_data['warnings'] = {
+                'message': 'Обнаружены пересечения с существующими мероприятиями',
+                'conflicts': self.warnings
+            }
+        
+        return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
+    
+    
 class StudentEventViewSet(viewsets.ModelViewSet):
     queryset = StudentEvent.objects.all()
     serializer_class = StudentEventSerializer
