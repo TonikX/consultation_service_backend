@@ -22,14 +22,14 @@ from .views import *
 
 router = routers.DefaultRouter()
 
-router.register('users', CustomUserViewSet)
-router.register('programs', ProgramViewSet)
-router.register('groups', GroupViewSet)
-router.register('subjects', SubjectViewSet)
-router.register('wrote-time', WroteTimeViewSet)
-router.register('events', EventViewSet)
-router.register('student-events', StudentEventViewSet)
-router.register('teacher-subjects', TeacherSubjectsViewSet)
+router.register("users", CustomUserViewSet)
+router.register("programs", ProgramViewSet)
+router.register("groups", GroupViewSet)
+router.register("subjects", SubjectViewSet)
+router.register("wrote-time", WroteTimeViewSet)
+router.register("events", EventViewSet)
+router.register("student-events", StudentEventViewSet)
+router.register("teacher-subjects", TeacherSubjectsViewSet)
 
 
 urlpatterns = [

@@ -140,15 +140,15 @@ STATIC_URL = "static/"
 AUTH_USER_MODEL = "main.CustomUser"
 
 DJOSER = {
-    'USER_CREATE_PASSWORD_RETYPE': True,
-    'SEND_ACTIVATION_EMAIL': False,
-    'SET_PASSWORD_RETYPE': True,
-    'PASSWORD_RESET_CONFIRM_RETYPE': True,
-    'LOGOUT_ON_PASSWORD_CHANGE': True,
-    'SERIALIZERS': {
-        'user_create': 'main.serializers.CustomUserCreateSerializer',
-        'user': 'main.serializers.CustomUserSerializer',
-        'current_user': 'main.serializers.CustomUserSerializer',
+    "USER_CREATE_PASSWORD_RETYPE": True,
+    "SEND_ACTIVATION_EMAIL": False,
+    "SET_PASSWORD_RETYPE": True,
+    "PASSWORD_RESET_CONFIRM_RETYPE": True,
+    "LOGOUT_ON_PASSWORD_CHANGE": True,
+    "SERIALIZERS": {
+        "user_create": "main.serializers.CustomUserCreateSerializer",
+        "user": "main.serializers.CustomUserSerializer",
+        "current_user": "main.serializers.CustomUserSerializer",
     },
 }
 
@@ -156,33 +156,27 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),  # Время жизни access token
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),     # Время жизни refresh token
-    'ROTATE_REFRESH_TOKENS': True,                    # Обновлять refresh token при использовании
-    'BLACKLIST_AFTER_ROTATION': True,                  # Добавлять старые токены в черный список
-    'UPDATE_LAST_LOGIN': True,                          # Обновлять дату последнего входа
-    
-    'ALGORITHM': 'HS256',                                # Алгоритм подписи
-    'SIGNING_KEY': SECRET_KEY,                           # Ключ подписи (твой SECRET_KEY)
-    'VERIFYING_KEY': None,                               
-    'AUDIENCE': None,
-    'ISSUER': None,
-    
-    'AUTH_HEADER_TYPES': ('Bearer', 'JWT'),              # Типы заголовков (Bearer или JWT)
-    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',            # Имя заголовка
-    'USER_ID_FIELD': 'id',                                # Поле идентификатора пользователя
-    'USER_ID_CLAIM': 'user_id',                           # Название поля в токене
-    
-    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
-    'TOKEN_TYPE_CLAIM': 'token_type',
-    
-    'JTI_CLAIM': 'jti',                                   # Уникальный ID токена
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),  # Время жизни access token
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),  # Время жизни refresh token
+    "ROTATE_REFRESH_TOKENS": True,  # Обновлять refresh token при использовании
+    "BLACKLIST_AFTER_ROTATION": True,  # Добавлять старые токены в черный список
+    "UPDATE_LAST_LOGIN": True,  # Обновлять дату последнего входа
+    "ALGORITHM": "HS256",  # Алгоритм подписи
+    "SIGNING_KEY": SECRET_KEY,  # Ключ подписи (твой SECRET_KEY)
+    "VERIFYING_KEY": None,
+    "AUDIENCE": None,
+    "ISSUER": None,
+    "AUTH_HEADER_TYPES": ("Bearer", "JWT"),  # Типы заголовков (Bearer или JWT)
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",  # Имя заголовка
+    "USER_ID_FIELD": "id",  # Поле идентификатора пользователя
+    "USER_ID_CLAIM": "user_id",  # Название поля в токене
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "TOKEN_TYPE_CLAIM": "token_type",
+    "JTI_CLAIM": "jti",  # Уникальный ID токена
 }

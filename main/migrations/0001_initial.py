@@ -231,7 +231,7 @@ class Migration(migrations.Migration):
                 ("start_time", models.DateTimeField(db_index=True)),
                 ("end_time", models.DateTimeField()),
                 (
-                    "recomended_number_students",
+                    "recommended_number_students",
                     models.IntegerField(blank=True, null=True),
                 ),
                 ("note", models.CharField(blank=True, max_length=512)),
