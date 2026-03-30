@@ -243,7 +243,7 @@ class StudentEventSerializer(serializers.ModelSerializer):
 
 class UserGroupSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserGroup
+        model = StudentGroup
         fields = "__all__"
 
 

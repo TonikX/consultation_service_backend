@@ -193,7 +193,7 @@ class StudentEvent(models.Model):
         return f"{self.event} - {self.user}"
 
 
-class UserGroup(models.Model):
+class StudentGroup(models.Model):
     user = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name="user_groups"
     )

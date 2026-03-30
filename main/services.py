@@ -10,7 +10,7 @@ from .models import (
     EventGroup,
     TeacherSubjects,
     TeacherSubjectsEvent,
-    UserGroup,
+    StudentGroup,
 )
 from django.db.models import Q
 
